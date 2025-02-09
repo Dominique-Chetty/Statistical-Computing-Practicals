@@ -1,0 +1,133 @@
+---
+title: "PracticalOne"
+format: 
+  html: 
+    code-fold: true
+---
+
+## Question 1
+
+#### Find all rows in "airquality" that have missing values.
+
+```{r}
+aq_data <- airquality
+
+#Counts how many rows have any column with an NA value
+print("Number of rows with NA values")
+sum(rowSums(is.na(aq_data)) > 0)
+
+#Find the location of missing values
+print("Position of the missing values")
+which(is.na(aq_data))
+
+# count total missing values 
+print("Count of total missing values  ")
+sum(is.na(aq_data))
+```
+
+## Question 2
+
+### Find mean, sd, min, max for each of temperature and ozone level.
+
+```{r}
+#Find the mean of Temperature
+print("The mean temperature is:")
+mean(aq_data$Temp)
+
+#Find the sd of Temperature
+print("The standard deviation of temperature is:")
+sd(aq_data$Temp)
+
+#Find the min Temperature
+print("The minimum temperature is:")
+min(aq_data$Temp)
+
+#Find the max Temperature
+print("The maximum temperature is:")
+max(aq_data$Temp)
+
+#############################################
+
+#Find the mean of ozone level
+print("The mean ozone level is:")
+mean(aq_data$Ozone, na.rm = TRUE)
+
+#Find the sd of ozone level
+print("The standard deviation of ozone level is:")
+sd(aq_data$Ozone, na.rm = TRUE)
+
+#Find the min ozone level
+print("The minimum ozone level is:")
+min(aq_data$Ozone, na.rm = TRUE)
+
+#Find the max ozone level
+print("The maximum ozone level is:")
+max(aq_data$Ozone, na.rm = TRUE)
+```
+
+## Question 3
+
+### Fit a simple linear regression model to the car data, i.e. find the β estimates, using the parameter estimate equation for linear regression, and matrix calculations.
+
+```{r}
+cars_data <- cars
+
+# Create the x variable vector for speed
+x <- cbind(1, cars_data$speed)
+
+# Create the y variable vector for distance
+y <- as.matrix(cars_data$dist)
+
+# Calculate the Beta parameter estimate
+beta_hat <- solve(t(x) %*% x)  %*%  t(x) %*% y
+print("The parameter estimates from the matrix calculation is:")
+beta_hat
+```
+
+## Question 4
+
+### Check that you get the same  β estimates as when fitting the linear regression model using lm()
+
+```{r}
+# linear regression model of the cars dataset 
+lm_model <-  lm(dist ~ speed, data = cars)
+
+#Get the Beta estimate
+print("The parameter estimates from the linear regression model is:")
+coef(lm_model)
+```
+
+### Extra:
+
+Create a function to calculate the beta, standard error and t-value of the linear regression model
+
+```{r}
+stats <- function(x, y) {
+  n <- length(y)
+  X <- cbind(1, x)  # adds the intercept term
+  beta_hat <- solve(t(X) %*% X) %*% (t(X) %*% y)  # calc the beta coefficient from X and y vectors
+  
+  y_hat <- X %*% beta_hat
+  residuals <- y - y_hat
+  sigma_sq <- sum(residuals^2) / (n - 2)  # calculates the variance 
+  
+  var_beta <- sigma_sq * solve(t(X) %*% X)  # calculates the variance-covariance matrix
+  std_error <- sqrt(diag(var_beta))  #  calculates the standard error of coefficients
+  
+  t_values <- beta_hat / std_error  # calculate the t-values
+  
+  return(list(beta = beta_hat[2], std_error = std_error[2], t_value = t_values[2]))
+}
+```
+
+Apply the stats function to the dependent and independent variables of the cars data set
+
+```{r}
+stats(cars$speed, cars$dist)
+```
+
+Compare the above calculated statistics to the pre-coded statistics for an lm function
+
+```{r}
+summary(lm_model)
+```

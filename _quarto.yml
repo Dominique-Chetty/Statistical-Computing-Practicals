@@ -1,0 +1,20 @@
+project:
+  type: website
+
+website:
+  title: "Practicals"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - PracticalOne.qmd
+      - PracticalTwo.qmd
+
+format:
+  html:
+    theme: darkly
+    css: styles.css
+    toc: true
+
+editor: visual
+

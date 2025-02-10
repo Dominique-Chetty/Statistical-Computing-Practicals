@@ -1,5 +1,68 @@
 ---
-title: "PracticalTwo"
+title: "Practical Two"
 ---
 
-Hiii this is my practical 2
+## 1. Generate Simulated Data
+
+```{r}
+# set the seed to create reproducable results
+set.seed(1)
+
+# create x as a sequence of numbers from 1 to 100
+x <- 1:100
+
+# Generate y as a noisy sine wave such that yi=sin(xi/10)+ei where ei∼N(0,0.22)
+e <- rnorm(100, mea = 0, sd = 0.2)
+
+y <- sin(x/10) + e
+```
+
+## 2. Implement the LOWESS Algorithm
+
+```{r}
+# Define a function customLowess(x, y, f) that returns the smoothed values
+
+customLowess <- function(x, y, f){
+  
+  y_smoothed <- numeric(100) # creates a vector to store the smoothed y values
+  
+  for (i in 1:100) {
+    k <- ceiling(f * 100) # Calculates the span
+    
+    # find the distances and get k nearest neighbors
+    distances <- abs(x - x[i])
+    idx <- order(distances)[1:k]
+    
+    # calculates the weights using the tricube kernel
+    dmax <- max(distances[idx])
+    weights <- (1 - (distances[idx] / dmax)^3)^3
+    weights[distances[idx] >= dmax] <- 0
+    
+    # perform weighted linear regression
+    X <- cbind(1, x[idx])  # design matrix
+    W <- diag(weights)  # Weight matrix
+    y_subset <- y[idx]
+    
+    beta_hat <- solve(t(X) %*% W %*% X) %*% (t(X) %*% W %*% y_subset)
+    
+    # Compute smoothed value
+    y_smoothed[i] <- beta_hat[1] + beta_hat[2] * x[i]
+  }
+  
+  return(y_smoothed)
+  
+}
+
+
+```
+
+## 3. Compare with R's Built-in `lowess()`
+
+```{r}
+# Use the built-in lowess() function with the same f value and plot both curves to compare their smoothing values
+
+plot(x = x, y = y, main = "Lowess function" )
+lines(lowess(x=x, y=y, f=0.25, iter = 0), col = "red") # displays the smoothed line by R's built-in function
+lines(x=x, y = customLowess(x=x, y=y, f=0.25), col = "blue")
+
+```

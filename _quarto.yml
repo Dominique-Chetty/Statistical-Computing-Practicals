@@ -9,6 +9,7 @@ website:
         text: Home
       - PracticalOne.qmd
       - PracticalTwo.qmd
+      - PracticalThree.qmd
 
 format:
   html:

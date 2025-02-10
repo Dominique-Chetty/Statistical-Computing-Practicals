@@ -1,5 +1,5 @@
 ---
-title: "PracticalOne"
+title: "Practical One"
 format: 
   html: 
     code-fold: true
